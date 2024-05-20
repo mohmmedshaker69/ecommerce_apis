@@ -67,23 +67,27 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'user', 'name', 'subcategory', 'price', 'description', 'image', 'status', 'quantity', 'attribute']
+        fields = ['id', 'user', 'name', 'subcategory', 'price', 'description', 'image', 'status', 'quantity', 'attribute', 'discount', 'date']
 
     def create(self, validated_data):
         attribute_data = validated_data.pop('attribute')
         product = super().create(validated_data)
-        for attribute_data in attribute_data:
-            ProductAtribute.objects.create(product=product, **attribute_data)
+        for attribute in attribute_data:
+            ProductAtribute.objects.create(product=product, **attribute)
         return product
 
     def update(self, instance, validated_data):
-        attributes_data = validated_data.pop('attribute')
+        attributes_data = validated_data.pop('attribute', None)
+
+
         instance = super().update(instance, validated_data)
-        for attribute_data in attributes_data:
-            attribute_obj, created = ProductAtribute.objects.update_or_create(
-                product=instance,
-                attribute=attribute_data.get('attribute'),
-                defaults={'quantity': attribute_data.get('quantity')}
-            )
+
+        if attributes_data:
+            for attribute_data in attributes_data:
+                attribute_obj, created = ProductAtribute.objects.update_or_create(
+                    product=instance,
+                    attribute=attribute_data.get('attribute'),
+                    defaults={'quantity': attribute_data.get('quantity')}
+                )
 
         return instance

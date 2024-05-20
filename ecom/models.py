@@ -64,7 +64,15 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/')
     status = models.BooleanField(default=False)
     quantity = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0, null=True, blank=True)  # Discount percentage
+    date = models.DateField(auto_now_add=True)
+    
 
+    class Meta:
+        ordering = ['-date']
+    @property
+    def price_with_discount(self):
+        return self.price * (1 - self.discount / 100)
 
     def __str__(self):
         return self.name

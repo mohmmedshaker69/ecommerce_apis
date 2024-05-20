@@ -37,7 +37,7 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().prefetch_related('sub_category')
     serializer_class = ProductSerializer
 
     @transaction.atomic
